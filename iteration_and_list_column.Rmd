@@ -1,5 +1,5 @@
 ---
-title: "ieration_and_list_column"
+title: "ieration and list column"
 author: "QiLu"
 date: "10/29/2019"
 output: html_document
@@ -141,10 +141,84 @@ otput = vector("list", length = 5)
 output= map(vec_urls, read_page_reviews)
 ```
 
+## list column
+```{r}
+weather = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728", "USC00519397", "USS0023B17S"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2016-01-01",
+    date_max = "2016-12-31") %>%
+  mutate(
+    name = recode(id, USW00094728 = "CentralPark_NY", 
+                      USC00519397 = "Waikiki_HA",
+                      USS0023B17S = "Waterhole_WA"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) %>%
+  select(name, id, everything())
+```
+
+
+nest within station
+```{r}
+weather_nest = 
+  weather %>% 
+  nest(data = date:tmin)
+```
+
+is list column really a list
+```{r}
+weather_nest %>% pull(name)
+weather_nest %>% pull(data)
+
+weather_nest$data[[1]]
+
+weather_nest %>% 
+  unnest()
+
+```
+
+## operation on list column
+do useful things with a list?
 
 
 
+```{r}
+output = vector("list", length = 3)
+```
 
+```{r}
+weather_lm = function(df){
+  lm(tmax ~ tmin, data = df)
+}
+```
+
+```{r}
+output = map(weather_nest$data, weather_lm)
+```
+
+## Useful linear model function
+build linear models for datasets
+```{r}
+weather_nest %>% 
+  mutate(lin_models = map(data, weather_lm)) %>% 
+  select(-data) %>% 
+  filter(name != "CentralPark_NY")
+```
+
+## Revisit napolean again
+```{r}
+
+napolean = tibble(
+  page = 1:5, 
+  urls = str_c(url_base, page)
+) %>% 
+  mutate(
+    reviews = map(urls, read_page_reviews)
+  ) %>% 
+  unnest(reviews) %>% 
+    select(-urls)
+```
 
 
 
