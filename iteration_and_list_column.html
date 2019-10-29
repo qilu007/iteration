@@ -505,7 +505,61 @@ output_median = map(df, median)
 output_summary = map(df, summary)
 
 output_median = map_dbl(df, median)
-output= map_dfr(df, mean_and_sd)</code></pre>
+output= map_dfr(df, mean_and_sd)
+
+output= map_dfr(df, ~mean_and_sd(.x))</code></pre>
+<pre class="r"><code>read_page_reviews = function(url) {
+  
+  h = read_html(url)
+  
+  title = h %&gt;%
+    html_nodes(&quot;#cm_cr-review_list .review-title&quot;) %&gt;%
+    html_text()
+  
+  stars = h %&gt;%
+    html_nodes(&quot;#cm_cr-review_list .review-rating&quot;) %&gt;%
+    html_text() %&gt;%
+    str_extract(&quot;\\d&quot;) %&gt;%
+    as.numeric()
+  
+  text = h %&gt;%
+    html_nodes(&quot;.review-data:nth-child(5)&quot;) %&gt;%
+    html_text()
+  
+  data_frame(title, stars, text)
+}</code></pre>
+<pre class="r"><code>url_base = &quot;https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&amp;reviewerType=avp_only_reviews&amp;sortBy=recent&amp;pageNumber=&quot;
+vec_urls = str_c(url_base, 1:5)
+
+vec_urls</code></pre>
+<pre><code>## [1] &quot;https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&amp;reviewerType=avp_only_reviews&amp;sortBy=recent&amp;pageNumber=1&quot;
+## [2] &quot;https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&amp;reviewerType=avp_only_reviews&amp;sortBy=recent&amp;pageNumber=2&quot;
+## [3] &quot;https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&amp;reviewerType=avp_only_reviews&amp;sortBy=recent&amp;pageNumber=3&quot;
+## [4] &quot;https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&amp;reviewerType=avp_only_reviews&amp;sortBy=recent&amp;pageNumber=4&quot;
+## [5] &quot;https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&amp;reviewerType=avp_only_reviews&amp;sortBy=recent&amp;pageNumber=5&quot;</code></pre>
+<pre class="r"><code>read_page_reviews(vec_urls[[1]])</code></pre>
+<pre><code>## Warning: `data_frame()` is deprecated, use `tibble()`.
+## This warning is displayed once per session.</code></pre>
+<pre><code>## # A tibble: 10 x 3
+##    title                     stars text                                    
+##    &lt;chr&gt;                     &lt;dbl&gt; &lt;chr&gt;                                   
+##  1 &quot;Gotta watch it!\n      …     5 &quot;Super fun cult film. A must-see! Funni…
+##  2 &quot;Great movie\n          …     5 &quot;Love this movie.\n            &quot;        
+##  3 &quot;Duh\n            &quot;           5 &quot;Best movie ever\n            &quot;         
+##  4 &quot;Great video\n          …     5 &quot;Product as described.  Great transacti…
+##  5 &quot;Give me some of your to…     5 &quot;This movie will always be my favorite …
+##  6 &quot;Nostalgic\n            &quot;     5 &quot;One of the best nostalgic movies of my…
+##  7 &quot;Make you giggle type mo…     5 &quot;I love, love, love this movie.  It mak…
+##  8 &quot;This movie is so stupid…     5 &quot;No, really.  It's so stupid.  Your IQ …
+##  9 &quot;Hilarious\n            &quot;     5 &quot;Hilarious\n            &quot;               
+## 10 &quot;Waste of money\n       …     1 &quot;Terrible movie! Please don’t waste you…</code></pre>
+<pre class="r"><code>otput = vector(&quot;list&quot;, length = 5)
+
+#for (i in 1:5){
+#  output[[i]] = read_page_reviews(vec_urls[[i]])
+#}
+
+output= map(vec_urls, read_page_reviews)</code></pre>
 <div id="r-markdown" class="section level2">
 <h2>R Markdown</h2>
 <p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
